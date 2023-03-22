@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+    <header class="text-white text-center p-4">
+        <h2>{{ page_title }}</h2>
+    </header>
+    <main class="container p-4 pb-2 bg-dark rounded text-center mb-5">
+        <!-- performances section -->
+        <section class="bg-dark rounded">
+            <!-- create card for db to populate-->
+            <div class="row d-flex justify-content-around">
+                {% for event in events %}
+                    <a href="{{ url_for('event.get_event', event_id=event.id) }}"
+                       class="card card-event bg-secondary mx-0 mx-sm-2 my-3 p-0 hover d-flex col-5 col-sm-3 col-md-2 bg-secondary">
+                        <img class="card-img my-auto h-100 w-auto"
+                             src="{{ url_for('img.event', event_id=event.id) }}"
+                             alt="Event Image" loading="lazy">
+                        <div class="card-img-overlay text-center p-0 d-flex align-content-between flex-column">
+                            <span class="text-light h5 position-absolute top-0 bg-dark bg-opacity-50 w-100">{{ event.name }}</span>
+                            <span class="text-light h6 position-absolute bottom-0 bg-dark bg-opacity-50 w-100 mb-0">{{ event.datetime.strftime("%B %d") }}</span>
+                        </div>
+
+                        <span class="position-absolute status badge {{ StatusColours[event.status.value] }}">
+                            {{ StatusText[event.status.value] }}
+                        </span>
+                    </a>
+                {% endfor %}
+                {% if not events %}
+                    <div class="col-12">
+                        <h3>No events found.</h3></div>
+                {% endif %}
+            </div>
+            <hr>
+            {% if page_title != "All Events" %}
+                <a class="h5 mt-2 d-block text-decoration-none" href="{{ url_for("event.all") }}">View All Events</a>
+            {% else %}
+                <a class="h5 mt-2 d-block text-decoration-none" href="{{ url_for("main.index") }}">
+                    <i class="bi bi-caret-left-fill"></i>Back to Home</a>
+            {% endif %}
+        </section>
+    </main>
+{% endblock %}

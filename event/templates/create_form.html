@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{#{% import "bootstrap/form.html" as wtf %}#}
+{% block content %}
+    <main class="container p-4 col-xl-8">
+        <div class="card container">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center border-bottom mt-1 mb-2">
+                <h1 class="m-0">{{heading}}</h1>
+                <button class="btn btn-primary btn-sm m-1" id="upload">Upload Photo</button>
+            </div>
+            <form class="row" method="post" enctype="multipart/form-data">
+                {{ form.csrf_token }}
+                {% for field in form %}
+                
+                    {% if field.id in ["artist", "name"] %}
+                        <div class="mb-2 col-sm-6">                              
+                            {% if field.id == "artist"%}                          
+                            {{field.count}}
+                            {{field.label(class_="form-label mb-1")}}<span class="mx-2"> - </span>Create an artist <a href="{{ url_for('artist.create') }}">here</a>.
+                            {% else %}
+                            {{ field.label(class_="form-label mb-1") }}
+                            {% endif %}
+                            {{ field(class_="form-control" + (" is-invalid" if field.errors else "")) }}
+                            {% if field.errors %}
+                                <div class="invalid-feedback">
+                                    {{ ", ".join(field.errors) }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% elif field.type in ["StringField", "DateField", "TimeField", "SelectField", "DecimalField", "IntegerField"] %}
+                        <div class="mb-2 col-sm-4">
+                            {{ field.label(class_="form-label mb-1") }}
+                            {% if field.id == "price" %}
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    {{ field(class_="form-control" + (" is-invalid" if field.errors else "")) }}
+                                    {% if field.errors %}
+                                        <div class="invalid-feedback">
+                                            {{ ", ".join(field.errors) }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                {{ field(class_="form-control" + (" is-invalid" if field.errors else "")) }}
+                                {% if field.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ ", ".join(field.errors) }}
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <div class="mb-2 col-sm-12">
+                    {{ form.desc.label(class_="form-label mb-1") }}
+                    {{ form.desc(class_="form-control" + (" is-invalid" if form.desc.errors else "")) }}
+                </div>
+                {% if form.desc.errors %}
+                    <div class="invalid-feedback">
+                        {{ ", ".join(form.desc.errors) }}
+                    </div>
+                {% endif %}
+                {{ form.image(class_="d-none") }}
+                <div class="col-sm-12 mt-1 mb-2 text-center">
+                    {{ form.submit(class_="btn btn-primary") }}
+                </div>
+            </form>
+            {#{{wtf.render_form(form)}}#}
+        </div>
+    </main>
+    <script defer src="{{ url_for('static', filename='js/create_event.js') }}"></script>
+{% endblock %}

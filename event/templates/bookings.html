@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block content %}
+    <header class="container p-4 pb-0">
+        <h1>Your tickets</h1>
+    </header>
+    <main class="container p-4 pt-0">
+
+        {% if not tickets %}
+        <div class="col-12">
+            <h3 class="text-center text-light">You have no bookings.</h3></div>
+        {% endif %}
+
+        {% for booking, event, artist in tickets %}
+        <article class="card ticket mb-3">
+            <div class="d-md-none row flex-row p-0">
+                <div class="col-6">
+                    <img class="m-1 rounded-2" src="{{ url_for('img.event', event_id=event.id) }}">
+                </div>
+                        
+                <div class="col-6">
+                    <a class="d-flex justify-content-center btn btn-primary py-3 mt-2 me-2" 
+                    href="{{ url_for('event.get_event', event_id=event.id) }}">View<br>Event</a>
+                </div>                    
+            </div>
+            <div class="row d-md-none">
+                <div class="table-responsive w-100">
+                    <table class="table m-0">
+                        <thead>
+                        <tr class="small">
+                            <th scope="col">Event</th>
+                            <th scope="col">Artist</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td class="border-bottom-0 col-md-2">{{ event.name }}</td>
+                            <td class="border-bottom-0 col-md-2">{{ artist.name }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div> 
+            </div>
+            <div class="d-flex">
+                    <img class="d-none d-md-block align-self-center"
+                         src="{{ url_for('img.event', event_id=event.id) }}">
+                    <div class="table-responsive w-100 ps-xl-2 ps-xxl-5 ms-xxl-5">
+                        <!-- Mobile Display of Table -->
+                        <table class="table mb-0 d-md-none">
+                            <thead>
+                            <tr class="small text-center">
+                                <th scope="col">Ticket ID</th>
+                                <th scope="col">Qty</th>
+                                <th scope="col">Time</th>
+                                <th scope="col">Date</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td class="border-bottom-0 col-3 text-center">{{ booking.id }}</td>
+                                <td class="border-bottom-0 col-2 text-center">{{ booking.tickets }}</td>
+                                <td class="border-bottom-0 col-3 text-center">{{ event.datetime.strftime("%I:%M %p") }}</td>
+                                <td class="border-bottom-0 col text-center">{{ event.datetime.strftime("%d/%m/%y") }}</td>
+                                
+                            </tr>
+                            </tbody>
+                        </table>
+                        <!-- Large Display Table -->
+                        <table class="table mb-0 d-none d-md-inline">
+                            <thead>
+                            <tr class="small">
+                                <th scope="col">Order ID</th>
+                                <th scope="col">Event Name</th>
+                                <th scope="col">Artist Name</th>
+                                <th scope="col">Qty</th>
+                                <th scope="col">Time</th>
+                                <th scope="col">Date</th>
+                                <th scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td class="border-bottom-0 col-md-1">{{ booking.id }}</td>
+                                <td class="border-bottom-0 col-md-2">{{ event.name }}</td>
+                                <td class="border-bottom-0 col-md-2">{{ artist.name }}</td>
+                                <td class="border-bottom-0 col-md-1">{{ booking.tickets }}</td>
+                                <td class="border-bottom-0 col-md-1">{{ event.datetime.strftime("%I:%M %p") }}</td>
+                                <td class="border-bottom-0 col-md-2">{{ event.datetime.strftime("%d/%m/%y") }}</td>
+                                <td class="border-bottom-0 col-md-2">
+                                    <a class="btn btn-primary btn-sm d-none d-sm-block"
+                                       href="{{ url_for('event.get_event', event_id=event.id) }}">View Event</a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </article>
+        {% endfor %}
+    
+        <hr>
+            <div class="card bg-transparent border-0 text-center">
+                <div class="card-body">
+                    <a class="h4 d-inline text-decoration-none ms-3" href="{{ url_for('event.all' )}}">
+                        Looking for your next incredible event? Click here to find something new!<i class="bi bi-caret-right-fill"></i></a>
+                </div>
+        
+
+    </main>
+{% endblock %}

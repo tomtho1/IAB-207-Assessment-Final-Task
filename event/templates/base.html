@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{{ title }}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
+            crossorigin="anonymous"></script>
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="static/img/favicon_io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="static/img/favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="static/img/favicon_io/favicon-16x16.png">
+    <link rel="manifest" href="static/img/favicon_io/site.webmanifest">
+    <!-- flashes any messages to the user -->
+    {% with messages = get_flashed_messages() %} {% if messages %}
+        <div class="col-11 col-sm-6 col-md-4 col-lg-3 col-xl-2 toast-flash toast-flash">
+            {% for message in messages %}
+                <!--loop through the messages-->
+                <div class="alert alert-info">{{ message }}</div>
+                <!--display as alert-->
+            {% endfor %}
+        </div>
+    {% endif %} {% endwith %}
+</head>
+
+<body class="d-flex flex-column">
+<noscript>
+    <div class="alert alert-danger text-center m-0 rounded-0" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i> Warning, JavaScript is Disabled!
+        Some features of this site requires JavaScript to be
+        <a class="text-dark" href="https://www.enable-javascript.com/">enabled</a>.
+    </div>
+</noscript>
+
+<header>
+    <nav class="navbar navbar-expand-lg glow">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='img/Elevental-logos/Elevental-rectangle_white.svg') }}"
+                     alt="Logo"
+                     width="150" height="30"
+                     class="d-inline-block align-text-top">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <div class="d-flex flex-wrap mt-2 mt-lg-auto me-auto">
+                    <ul class="navbar-nav flex-row flex-wrap align-self-center">
+                        <li class="nav-item">
+                            <a class="nav-link active p-2" aria-current="page"
+                               href="{{ url_for('main.index') }}">Home</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link p-2 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                               aria-expanded="false">
+                                Artists & Band
+                            </a>
+                            <ul class="dropdown-menu position-absolute">
+                                {% for artist in artists %}
+                                    <li><a class="dropdown-item"
+                                           href="{{ url_for('artist.get_artist' , artist_id = artist.id) }}">{{ artist.name }}</a>
+                                    </li>
+                                {% endfor %}
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link p-2 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                               aria-expanded="false">
+                                Genres
+                            </a>
+                            <ul class="dropdown-menu position-absolute dropdown-menu-end dropdown-menu-lg-start">
+                                {% for genre in genres %}
+                                    <li><a class="dropdown-item"
+                                           href="{{ url_for('main.genre',genre=genre[0]) }}">{{ genre[0] }}</a></li>
+                                {% endfor %}                                
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="{{ url_for('event.all') }}">View All Events</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="d-flex flex-row flex-wrap align-items-end">
+                    <form class="d-flex mx-2 mx-lg-0" action="{{ url_for('main.search') }}" role="search">
+                        <input type="text" name="search" class="form-control me-1" id="SearchForm"
+                               placeholder="Search Artist or Location"
+                               aria-label="Search">
+                        <button type="submit" class="btn btn-primary ms-sm-2 bi bi-search" title="Search"></button>
+                    </form>
+                    <div class="dropdown ms-2 ms-sm-3 mt-2 mt-sm-0">
+                        <button class="btn btn-secondary dropdown-toggle bi bi-person-fill" type="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false" title="Account">&nbsp;
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-sm-start dropdown-menu-lg-end position-absolute">
+
+                            {% if current_user.is_authenticated %}
+                                <li><a class="dropdown-item" href="{{ url_for('booking.history') }}">View Tickets &
+                                    History</a>
+                                </li>
+                                <li><a class="dropdown-item" href="{{ url_for('event.my_events') }}">My Events</a>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="{{ url_for('venue.create') }}">Create Venue</a>
+                                </li>
+                                <li><a class="dropdown-item" href="{{ url_for('artist.create') }}">Create Artist</a>
+                                </li>
+                                <li><a class="dropdown-item" href="{{ url_for('event.create') }}">Create Event</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                <a class="dropdown-item"
+                                   href="{{ url_for('auth.logout', next=request.path) }}">Logout</a>
+                            {% else %}
+                                <a class="dropdown-item" href="{{ url_for('auth.login', next=request.path) }}">Login</a>
+                                <a class="dropdown-item"
+                                   href="{{ url_for('auth.register', next=request.path) }}">Register</a>
+                            {% endif %}
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+
+{% block content %}
+{% endblock %}
+<footer class="bg-dark text-white text-center py-2 mt-auto">
+    <div class="container">
+        <div class="row my-1">
+            <ul class="nav justify-content-center">
+                <li class="nav-item"><a href="{{ url_for("main.index") }}" class="nav-link px-2 text-muted hover">Home</a></li>
+                <li class="nav-item"><a href="{{ url_for("event.all") }}" class="nav-link px-2 text-muted hover">All Events</a></li>
+                {% if current_user.is_authenticated %}
+                    <li class="nav-item"><a href="{{ url_for("event.create") }}" class="nav-link px-2 text-muted hover">Create an Event</a></li>
+                    <li class="nav-item"><a href="{{ url_for("booking.history") }}" class="nav-link px-2 text-muted hover">My Tickets</a></li>
+                {% else %}
+                    <li class="nav-item"><span class="nav-link px-2 text-muted">🎶🎚️🎛️</span></li>
+                    <li class="nav-item"><a href="{{ url_for("auth.login") }}" class="nav-link px-2 text-muted hover">Login</a></li>
+                    <li class="nav-item"><a href="{{ url_for("auth.register") }}" class="nav-link px-2 text-muted hover">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+        <div class="card py-1 mx-5 border-0">
+            <div class="footer-acknowledgement pt-3">
+                <p3>In the spirit of reconciliation, Elevental acknowledges the Traditional Custodians of Country throughout Australia and their connections to land, water and community. 
+                    We pay our respects to Elders past and present, and extend that respect to all Aboriginal and Torres Strait Islander peoples today.</p3>
+            </div>
+        </div>
+    </div>
+    
+    <p class="mb-1">&copy; Elevental 2022</p>
+    <a href="#" class="bi bi-facebook mx-2"></a>
+    <a href="#" class="bi bi-instagram mx-2"></a>
+    <a href="#" class="bi bi-twitter mx-2"></a>
+</footer>
+</body>
+
+</html>

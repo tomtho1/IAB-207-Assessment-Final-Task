@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block content %}
+    <header class="header-gradient text-white text-center p-4">
+        <div class="hero-logo">
+            <img class="img-fluid glow mh-100"
+                 src="{{ url_for('static', filename='img/Elevental-logos/Elevental-rectangle_white.svg') }}" alt="logo">
+        </div>
+        <hr>
+        <h1>Welcome to Elevental{{ " " + current_user.name if current_user.is_authenticated }}!</h1>
+        <p1>Elevental allows you to find your favourite artists performances at the best prices while also providing an
+            amazing platform for you to discover something new! <br>
+            From Dance and 8-bit to Big Band and Jazz, Elevental has you covered for all of your musical performance
+            needs!
+        </p1>
+        <hr>
+    </header>
+
+    {# remove this when you have the featured event.id #}
+    {% set featured_id = 1 %}
+
+    <div class="card border-0 text-center py-1">
+        <h2>Featured Performance</h2>
+        <img class="rounded glow mb-1 hero-image align-self-center"
+            src="{{ url_for('img.event', event_id=featured_id) }}">
+        {# replace featured_id you have the featured event.id #}
+    </div>
+
+    <div class="container pb-4">
+        <div class="card text-center py-3 border-0 bg-transparent">
+            <h2 class="mb-1">{{ events[0].name }}</h2>
+            <p class="mb-2">{{ events[0].desc }} on {{ events[0].datetime.strftime("%B %d") }}</p>
+            <a class="btn btn-secondary text-white book-button align-self-center hover"
+                href="{{ url_for('event.get_event', event_id=1) }}">Buy Tickets</a>
+        </div>
+    </div>
+
+    
+
+
+
+    <main class="container p-4 mb-4">
+        <section class="mb-3 text-center">
+        <!-- performances section -->
+            <section class="mb-3 p-4 bg-dark rounded">
+                <h4 class="d-inline" id="performances">Explore Performances</h4>
+                <a class="h4 d-inline text-decoration-none ms-3" href="{{ url_for('event.all' )}}">
+                    View All<i class="bi bi-caret-right-fill"></i></a>
+                <!-- create card for db to populate-->
+                <div class="row d-flex justify-content-around mt-4">
+                    {% for event in events %}
+                        <a href="{{ url_for('event.get_event', event_id=event.id) }}"
+                            class="card card-event bg-secondary mx-0 mx-sm-2 my-3 p-0 hover d-flex col-5 col-sm-3 col-md-2">
+                            <img class="card-img my-auto h-100 w-auto"
+                                src="{{ url_for('img.event', event_id=event.id) }}"
+                                alt="Event Image" loading="lazy">
+                            <div class="card-img-overlay text-center p-0 d-flex align-content-between flex-column">
+                                <span class="text-light h5 position-absolute top-0 bg-dark bg-opacity-50 w-100">{{ event.name }}</span>
+                                <span class="text-light h6 position-absolute bottom-0 bg-dark bg-opacity-50 w-100 mb-0">{{ event.datetime.strftime("%B %d") }}</span>
+                            </div>
+
+                            <span class="position-absolute status badge {{ StatusColours[event.status.value] }}">
+                                {{ StatusText[event.status.value] }}
+                            </span>
+                        </a>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- genres section -->
+            <section class="mb-5 mt-5 p-4 bg-dark rounded">
+                <div class="row">
+                    <h4 class="d-inline mb-4">Popular Genres</h4>
+                </div>
+
+                <div class="row d-flex justify-content-around">
+                    {% for genre in genres %}
+                    <div class="card border-0 col-md-3 py-4">
+                        <a href="{{ url_for('main.genre',genre=genre[0]) }}#performances">
+                            <button class="btn btn-primary text-white book-button align-self-center w-75 hover">{{ genre[0] }}</button>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div> 
+                
+            </section>
+
+            <!-- bands section -->
+            <section class="mb-5 mt-5 p-4 bg-dark rounded">
+                <div class="row">
+                    <h4 class="d-inline mb-4">Browse By Band</h4>
+                </div>
+
+                <div class="row d-flex justify-content-around">
+                    {% for artist in artists %}
+                        <a href="{{ url_for('artist.get_artist' , artist_id = artist.id) }}"
+                            class="card card-event bg-secondary mx-0 mx-sm-2 my-3 p-0 hover d-flex col-5 col-sm-3 col-md-2">
+                            <img class="card-img my-auto h-100 w-auto"
+                                src="{{ url_for('img.artist', artist_id=artist.id) }}"
+                                alt="Event Image" loading="lazy">
+                            <div class="card-img-overlay text-center p-0 d-flex align-content-between flex-column">
+                                <span class="text-light h5 position-absolute top-0 bg-dark bg-opacity-50 w-100">{{ artist.name }}</span>                                                                
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div> 
+                
+            </section>
+
+            <!-- Venue section -->
+            <section class="mb-5 mt-5 p-4 bg-dark rounded">
+                <div class="row">
+                    <h4 class="d-inline mb-4">Browse By Venue</h4>
+                </div>
+
+                <div class="row d-flex justify-content-around">
+                    {% for venue in venues %}
+                        <a href="{{ url_for('venue.get_venue' , venue_id = venue.id) }}"
+                            class="card card-event bg-secondary mx-0 mx-sm-2 my-3 p-0 hover d-flex col-5 col-sm-3 col-md-2">
+                            <img class="card-img my-auto h-100 w-auto"
+                                src="{{ url_for('img.venue', venue_id=venue.id) }}"
+                                alt="Event Image" loading="lazy">
+                            <div class="card-img-overlay text-center p-0 d-flex align-content-between flex-column">
+                                <span class="text-light h5 position-absolute top-0 bg-dark bg-opacity-50 w-100">{{ venue.name }}</span>                                                                
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div> 
+                
+            </section>
+    </main>
+{% endblock %}

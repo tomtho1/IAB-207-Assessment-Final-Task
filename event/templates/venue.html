@@ -1,0 +1,96 @@
+{% extends 'base.html' %} {% block content %}
+<header
+  class="position-relative bg-dark text-white text-center p-4 hero-img"
+  style="background-image: url('{{ url_for('img.venue', venue_id=venue.id) }}');"
+>
+  <h1
+    class="display-3 position-absolute top-50 start-50 translate-middle bg-dark bg-opacity-50 rounded px-2 pb-1"
+  >
+    {{ venue.name }}
+  </h1>
+</header>
+<main class="container p-4">
+    <section>
+        <div class="row mb-5">
+            <div class="p-2 col-sm-6 col-md-9 col-lg-9">
+            <div class="card">
+                <div class="card-header py-1 small">Venue Name</div>
+                <div class="card-body">
+                <h5 class="card-text">{{ venue.name }}</h5>
+                </div>
+            </div>
+            </div>
+
+            <div class="p-2 col-sm-6 col-md-3">
+            <div class="card">
+                <div class="card-header py-1 small">City</div>
+                <div class="card-body">
+                <h5 class="card-text">{{venue.city}}</h5>
+                </div>
+            </div>
+            </div>
+
+            <div class="p-2 col-sm-12 col-md-6 col-lg-6">
+            <div class="card">
+                <div class="card-header py-1 small">Address</div>
+                <div class="card-body">
+                <h5 class="card-text">{{venue.street_number}} {{venue.street}}</h5>
+                </div>
+            </div>
+            </div>
+
+            <div class="p-2 col-sm-6 col-md-3 col-lg-3">
+            <div class="card">
+                <div class="card-header py-1 small">State</div>
+                <div class="card-body">
+                <h5 class="card-text">{{ venue.state }}</h5>
+                </div>
+            </div>
+            </div>
+        
+            <div class="p-2 col-sm-6 col-md-3 col-lg-3">
+                <div class="card">
+                <div class="card-header py-1 small">Post Code</div>
+                <div class="card-body">
+                    <h5 class="card-text">{{ venue.post_code }}</h5>
+                </div>
+                </div>
+            </div>    
+        </div>  
+    </section>
+
+<section class="container p-4 mb-4 bg-dark rounded">
+    <section class="mb-3 text-center">
+        <section class="mb-3">
+            <h4 class="d-inline">Events playing at {{venue.name}}</h4>
+            <!-- create card for db to populate-->
+            <div class="row d-flex justify-content-around mt-3">
+                {% for event in events %}
+                    <a href="{{ url_for('event.get_event', event_id=event.id) }}"
+                       class="card card-event bg-secondary m-1 p-0 hover d-flex col-5 col-sm-3 col-md-2">
+                        <img class="card-img my-auto h-100 w-auto"
+                             src="{{ url_for('img.event', event_id=event.id) }}"
+                             alt="Event Image" loading="lazy">
+                        <div class="card-img-overlay text-center p-0 d-flex align-content-between flex-column">
+                            <span class="text-light h5 position-absolute top-0 bg-dark bg-opacity-50 w-100">{{ event.name }}</span>
+                            <span class="text-light h6 position-absolute bottom-0 bg-dark bg-opacity-50 w-100 mb-0">{{ event.datetime.strftime("%B %d") }}</span>
+                        </div>
+                        <span class="position-absolute status badge {{ StatusColours[event.status.value] }}">
+                            {{ StatusText[event.status.value] }}
+                        </span>
+                        <!-- <span class="position-absolute status badge bg-danger">{{ event.status | replace("EventStatus.","") }}</span> -->
+                    </a>
+                {% endfor %}
+                {% if not events %}
+                <div class="col-12">
+                    <h3 class="text-light">No events found.</h3>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+    </section>
+
+</main>
+
+<script defer src="{{ url_for('static', filename='js/event.js') }}"></script>
+{% endblock %}

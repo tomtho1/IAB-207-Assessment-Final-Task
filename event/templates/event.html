@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% block content %}
+    <header class="position-relative bg-dark text-white text-center p-4 hero-img"
+            {% if event %}
+            style="background-image: url('{{ url_for('img.event', event_id=event.id) }}');">
+            {% else %}
+                style="background-image: url('{{ url_for('img.artist', artist_id=artist.id) }}');">
+            {% endif %}
+
+    <h1 class="display-3 position-absolute top-50 start-50 translate-middle bg-dark bg-opacity-50 rounded px-2 pb-1">
+        {% if event %}
+            {{ event.name }}
+        {% else %}
+            {{ artist.name }}
+        {% endif %}
+    </h1>
+    </header>
+    <main class="container p-4">
+
+        <div class="row">
+            {% if event %}
+                <div class="p-2 col-sm-6 col-md-3 col-lg-4">
+                    <div class="card">
+                        <div class="card-header py-1 small">Artist Name</div>
+                        <div class="card-body">
+                            <a class="card-text h5 text-decoration-none"
+                               href="{{ url_for("artist.get_artist", artist_id=artist.id) }}">{{ artist.name }}</a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="p-2 col-sm-6 col-md-9 col-lg-9">
+                    <div class="card">
+                        <div class="card-header py-1 small">Artist Name</div>
+                        <div class="card-body">
+                            <h5 class="card-text">{{ artist.name }}</h5>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if event %}
+                <div class="p-2 col-sm-6 col-md-3">
+                    <div class="card">
+                        <div class="card-header py-1 small">Date</div>
+                        <div class="card-body">
+                            <h5 class="card-text">{{ event.datetime.strftime("%I:%M %p on %d/%m/%y") }}</h5>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-2 col-sm-6 col-md-3">
+                    <div class="card">
+                        <div class="card-header py-1 small">Venue</div>
+                        <div class="card-body">
+                            <a class="card-text h5 text-decoration-none"
+                               href="{{ url_for("venue.get_venue", venue_id=event.venue) }}">
+                                {{ venue }}</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-2 col-sm-6 col-md-3 col-lg-2">
+                    <div class="card">
+                        <div class="card-header py-1 small">Tickets Available</div>
+                        <div class="card-body">
+                            <h5 class="card-text">{{ "{:,}".format(tickets_avail) }}</h5>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="p-2 col-sm-6 col-md-3">
+                    <div class="card">
+                        <div class="card-header py-1 small">Genre</div>
+                        <div class="card-body">
+                            <h5 class="card-text">{{ artist.genre }}</h5>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if event %}
+                <div class="p-2 col-md-9 col-lg-10 d-flex align-items-stretch">
+                <div class="card w-100">
+                <div class="card-header py-1 small">Description</div>
+                <div class="card-body">
+                <p class="card-text">{{ event.desc }}</p>
+            {% else %}
+                <div class="p-2 col-md-12 col-lg-12 d-flex align-items-stretch">
+                <div class="card w-100">
+                <div class="card-header py-1 small">Description</div>
+                <div class="card-body">
+                <p class="card-text">{{ artist.desc }}</p>
+            {% endif %}
+            </div>
+            </div>
+            </div>
+            {% if event %}
+                <div class="p-2 col-md-3 col-lg-2 sticky-sm-top">
+                    <div class="card">
+                        <div class="card-body">
+                            <form class="text-center"
+                                  action="{{ url_for("event.create_booking", event_id=event.id) }}" method="post">
+                                {% set max_tickets = tickets_avail if tickets_avail < 10 else 10 %}
+                                <div class="mb-1">
+                                    <label for="quantity" class="form-label mb-1">Quantity</label>
+                                    <input type="number" class="form-control" id="quantity" name="tickets"
+                                           value="1" min="1"
+                                           max="{{ max_tickets }}" {{ "disabled" if event.status.name != "open" }}>
+                                <span class="small">Max {{ max_tickets }} Tickets.</span>
+                                </div>
+                                <div class="mb-1">
+                                    <label for="cost" class="form-label mb-1">Cost</label>
+                                    <input type="text" class="form-control" id="cost" disabled
+                                           data-cost="{{ price[0]|string + "." + price[1]|string }}"
+                                           value="{{ "$" + price[0]|string + "." + price[1]|string if event.price else "Free" }}">
+                                </div>
+                                <button type="submit"
+                                        class="btn btn-secondary my-1" {{ "disabled" if event.status.name != "open" }}>
+                                    Buy
+                                </button>
+                                {% if artist.user == current_user.id %}
+                                    <hr class="my-1">
+                                    <a href="{{ url_for("event.edit", event_id=event.id) }}"
+                                       class="btn btn-sm btn-primary mt-1">
+                                        Edit Event
+                                    </a>
+                                {% endif %}
+                            </form>
+                        </div>
+                        <div class="card-footer py-1 small text-white {{ StatusColours[event.status.value] }}">
+                            Status:
+                            <span class="fw-bold">
+                            {{ StatusText[event.status.value] }}
+                        </span>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            <div class="p-2 col-12">
+                {% if event %}
+                    <div class="card">
+                    <div class="card-header py-1 small">Comments</div>
+                    <div class="card-body">
+                        {% if current_user.is_authenticated %}
+                            <div class="card comment mb-3">
+                                <form class="flex-fill ps-0"
+                                      action="{{ url_for("event.create_comment", event_id=event.id) }}"
+                                      method="post">
+                                    <div class="card-header py-1 small d-flex justify-content-between">
+                                        <label for="comment" class="fw-bold">New Comment</label>
+                                        <button class="btn btn-primary btn-sm py-0" type="submit">Post</button>
+                                    </div>
+                                    <textarea class="card-body py-1 w-100 border-0 bg-transparent" id="comment"
+                                              name="comment" placeholder="Add a comment..."></textarea>
+                                </form>
+                            </div>
+                        {% else %}
+
+                            <div class="card justify-content-between text-center bg-0 border-0">
+                            <a href="/login">
+                                <button class="btn btn-outline-primary my-1">Login to leave a comment</button>
+                            </a>
+
+                        {% endif %}
+                        {% for comment in event.comments[::-1] %}
+                            <div class="card comment my-3">
+                                <div class="d-flex">
+                                    <div class="comment-img">
+                                        <img src="{{ url_for('img.user', user_id=comment.user) }}">
+                                    </div>
+                                    <div class="flex-fill ps-0">
+                                        <div class="card-header py-1 small"><span
+                                                class="fw-bold">{{ get_username(comment.user) }}</span><span
+                                                class="ms-3">{{ comment.datetime.strftime("%d/%m/%y") }}</span>
+                                        </div>
+                                        <div class="card-body py-1">{{ comment.text }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if not event %}
+                    <section class="container p-4 mb-4 bg-dark rounded">
+                        <section class="mb-3 text-center">
+                            <section class="mb-3">
+                                <h4 class="d-inline">Events {{ artist.name }} Are Playing</h4>
+                                <!-- create card for db to populate-->
+                                <div class="row d-flex justify-content-around mt-3">
+                                    {% for event in events %}
+                                        <a href="{{ url_for('event.get_event', event_id=event.id) }}"
+                                           class="card card-event bg-secondary m-1 p-0 hover d-flex col-5 col-sm-3 col-md-2">
+                                            <img class="card-img my-auto h-100 w-auto"
+                                                 src="{{ url_for('img.event', event_id=event.id) }}"
+                                                 alt="Event Image" loading="lazy">
+                                            <div class="card-img-overlay text-center p-0 d-flex align-content-between flex-column">
+                                                <span class="text-light h5 position-absolute top-0 bg-dark bg-opacity-50 w-100">{{ event.name }}</span>
+                                                <span class="text-light h6 position-absolute bottom-0 bg-dark bg-opacity-50 w-100 mb-0">{{ event.datetime.strftime("%B %d") }}</span>
+                                            </div>
+                                            <span class="position-absolute status badge {{ StatusColours[event.status.value] }}">
+                                                {{ StatusText[event.status.value] }}
+                                            </span>
+                                            <!-- <span class="position-absolute status badge bg-danger">{{ event.status | replace("EventStatus.","") }}</span> -->
+                                        </a>
+                                    {% endfor %}
+                                    {% if not events %}
+                                        <div class="col-12">
+                                            <h3 class="text-light">No events found.</h3>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </section>
+                        </section>
+                    </section>
+                {% endif %}
+
+
+                </div>
+            </div>
+    </main>
+
+    <script defer src="{{ url_for('static', filename='js/event.js') }}"></script>
+{% endblock %}
